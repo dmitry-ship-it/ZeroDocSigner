@@ -25,6 +25,9 @@ Tech selection (based on my experience, complexity and my own desire):
 - [ ] Is C# based app would be easier to maintain during production?
 - [ ] Is C++ based app would be easier to maintain during production?
 - [ ] Is JS/TS based app would be easier to maintain during production?
+- [ ] Should this app support storing more than one signature per file?
+- [ ] Should this app store information about resigning?
+- [ ] Should it store full information about resigning?
 
 ### File platforms & extensions which should be included into available-to-sign list
 1. Old Microsoft Office files (binary):
