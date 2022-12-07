@@ -4,8 +4,8 @@ namespace ZeroDocSigner.Common
 {
     public interface ISigner
     {
-        public void CreateSignature(SignatureParameters parameters, bool force = false);
+        public byte[] CreateSignature(SignatureParameters parameters, bool force = false);
 
-        public void AddSignature();
+        public byte[] AddSignature();
     }
 }

@@ -16,5 +16,12 @@ namespace ZeroDocSigner.Common.Algorithm
 
         [JsonConverter(typeof(HashAlgorithmNameConverter))]
         public HashAlgorithmName HashAlgorithmName { get; init; }
+
+        [JsonIgnore]
+        public static SignatureParameters Default => new()
+        {
+            HashAlgorithmName = HashAlgorithmName.SHA256,
+            SignatureAlgorithmName = SignatureAlgorithmName.RSA
+        };
     }
 }

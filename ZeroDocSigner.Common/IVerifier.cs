@@ -8,6 +8,6 @@ namespace ZeroDocSigner.Common
 
         public bool Verify(Signature signature);
 
-        public bool FileContainsSignature { get; }
+        public bool DataContainsSignature { get; }
     }
 }

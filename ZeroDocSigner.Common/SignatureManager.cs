@@ -8,80 +8,73 @@ namespace ZeroDocSigner.Common
 {
     public class SignatureManager : ISigner, IVerifier
     {
-        private readonly FileInfo _file;
+        private readonly byte[] _data;
         private readonly X509Certificate2 _certificate;
         private readonly long _signaturesStart;
 
         public SignatureManager(
-            FileInfo file,
+            byte[] data,
             X509Certificate2 certificate)
         {
-            if (!file.Exists)
-            {
-                throw new ArgumentException($"File {file.Name} does not exist.");
-            }
-
-            _file = file;
+            _data = data;
             _certificate = certificate;
 
-            _signaturesStart = GetSignaturesPos();
-
-            long GetSignaturesPos()
-            {
-                var start = Encoding.Default.GetBytes(SignatureInfo.StartSequence);
-                var data = File.ReadAllBytes(_file.FullName);
-                for (var i = 0; i < data.Length; i++)
-                {
-                    if (data[i] == start[0])
-                    {
-                        var j = 0;
-
-                        while (i != data.Length && j != start.Length && data[i] == start[j])
-                        {
-                            i++;
-                            j++;
-                        }
-
-                        if (j == start.Length)
-                        {
-                            return i + 2;
-                        }
-                    }
-                }
-
-                return -1;
-            }
+            var start = Encoding.Default.GetBytes(SignatureInfo.StartSequence);
+            _signaturesStart = GetSignaturesPos(_data);
         }
 
-        public bool FileContainsSignature => _signaturesStart != -1;
+        private static long GetSignaturesPos(byte[] data)
+        {
+            var start = Encoding.Default.GetBytes(SignatureInfo.StartSequence);
+            for (var i = 0; i < data.Length; i++)
+            {
+                if (data[i] == start[0])
+                {
+                    var j = 0;
 
-        public void AddSignature()
+                    while (i != data.Length
+                        && j != start.Length
+                        && data[i] == start[j])
+                    {
+                        i++;
+                        j++;
+                    }
+
+                    if (j == start.Length)
+                    {
+                        return i + 2;
+                    }
+                }
+            }
+
+            return -1;
+        }
+
+        public byte[] AddSignature()
         {
             throw new NotImplementedException();
         }
 
-        public void CreateSignature(
+        public byte[] CreateSignature(
             SignatureParameters parameters,
             bool force = false)
         {
-            if (!force && FileContainsSignature)
+            if (!force && _signaturesStart != -1)
             {
                 throw new ArgumentException("This file already contains signature(s).");
             }
 
-            var fileData = GetFileData();
+            var fileData = GetContent();
             var signatures = SignatureInfo.GetNewSignatureInfo(fileData, _certificate, parameters);
 
-            var result = fileData.Concat(
+            return fileData.Concat(
                 Encoding.Default.GetBytes(signatures.ToString()))
                     .ToArray();
-
-            File.WriteAllBytes(_file.FullName, result);
         }
 
         public bool Verify()
         {
-            if (!FileContainsSignature)
+            if (_signaturesStart == -1)
             {
                 throw new InvalidOperationException("Nothing to verify.");
             }
@@ -96,8 +89,7 @@ namespace ZeroDocSigner.Common
                 signature.Parameters,
                 _certificate);
 
-            var data = GetFileData();
-
+            var data = GetContent();
             using var hasher = HashAlgorithm.Create(signature.Parameters.HashAlgorithmName.Name!)!;
 
             return verifier.VerifySignature(hasher.ComputeHash(data), signature);
@@ -105,31 +97,27 @@ namespace ZeroDocSigner.Common
 
         private SignatureInfo? GetSignatures()
         {
-            if (!FileContainsSignature)
+            if (_signaturesStart == -1)
             {
                 return null;
             }
 
-            using var file = _file.OpenRead();
-            file.Position = _signaturesStart;
-            using var reader = new StreamReader(file);
+            var signBytes = new byte[_data.Length - _signaturesStart];
+            Array.Copy(_data, _signaturesStart, signBytes, 0, signBytes.Length);
 
-            var content = reader.ReadToEnd();
-            Console.WriteLine(content);
-            return JsonSerializer.Deserialize<SignatureInfo>(content);
+            return JsonSerializer.Deserialize<SignatureInfo>(
+                Encoding.Default.GetString(signBytes));
         }
 
-        private byte[] GetFileData()
+        private byte[] GetContent()
         {
-            if (!FileContainsSignature)
+            if (_signaturesStart == -1)
             {
-                Console.WriteLine(File.ReadAllText(_file.FullName));
-                return File.ReadAllBytes(_file.FullName);
+                return _data;
             }
 
-            using var reader = _file.OpenRead();
             var data = new byte[_signaturesStart - SignatureInfo.StartSequence.Length - 2];
-            reader.ReadExactly(data);
+            Array.Copy(_data, data, data.Length);
 
             return data;
         }
