@@ -10,7 +10,6 @@ namespace ZeroDocSigner.Common
     {
         private readonly FileInfo _file;
         private readonly X509Certificate2 _certificate;
-
         private readonly long _signaturesStart;
 
         public SignatureManager(
@@ -29,19 +28,24 @@ namespace ZeroDocSigner.Common
 
             long GetSignaturesPos()
             {
-                var start = SignatureInfo.StartSequence;
-                using var file = _file.OpenRead();
-                using var reader = new StreamReader(file);
-
-                var read = 0L;
-                var nextLine = string.Empty;
-                while (!reader.EndOfStream)
+                var start = Encoding.Default.GetBytes(SignatureInfo.StartSequence);
+                var data = File.ReadAllBytes(_file.FullName);
+                for (var i = 0; i < data.Length; i++)
                 {
-                    nextLine = reader.ReadLine();
-                    read += nextLine.Length;
-                    if (nextLine.Contains(start))
+                    if (data[i] == start[0])
                     {
-                        return read + start.Length + 1;
+                        var j = 0;
+
+                        while (i != data.Length && j != start.Length && data[i] == start[j])
+                        {
+                            i++;
+                            j++;
+                        }
+
+                        if (j == start.Length)
+                        {
+                            return i + 2;
+                        }
                     }
                 }
 
@@ -60,7 +64,7 @@ namespace ZeroDocSigner.Common
             SignatureParameters parameters,
             bool force = false)
         {
-            if (!force && _signaturesStart != -1)
+            if (!force && FileContainsSignature)
             {
                 throw new ArgumentException("This file already contains signature(s).");
             }
@@ -77,12 +81,12 @@ namespace ZeroDocSigner.Common
 
         public bool Verify()
         {
-            if (_signaturesStart == -1)
+            if (!FileContainsSignature)
             {
                 throw new InvalidOperationException("Nothing to verify.");
             }
 
-            var signatures = GetSignatures();
+            var signatures = GetSignatures()!;
             return signatures.Signatures.Any(Verify);
         }
 
@@ -101,7 +105,7 @@ namespace ZeroDocSigner.Common
 
         private SignatureInfo? GetSignatures()
         {
-            if (_signaturesStart == -1)
+            if (!FileContainsSignature)
             {
                 return null;
             }
@@ -117,7 +121,7 @@ namespace ZeroDocSigner.Common
 
         private byte[] GetFileData()
         {
-            if (_signaturesStart == -1)
+            if (!FileContainsSignature)
             {
                 Console.WriteLine(File.ReadAllText(_file.FullName));
                 return File.ReadAllBytes(_file.FullName);
@@ -126,9 +130,6 @@ namespace ZeroDocSigner.Common
             using var reader = _file.OpenRead();
             var data = new byte[_signaturesStart - SignatureInfo.StartSequence.Length - 2];
             reader.ReadExactly(data);
-
-            //Console.WriteLine(Encoding.Default.GetString(data));
-            //Console.WriteLine("-----------------------------------");
 
             return data;
         }
