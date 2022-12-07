@@ -21,7 +21,7 @@ namespace ZeroDocSigner.Common.Algorithm
             return _formatter.CreateSignature(hash);
         }
 
-        public bool VerifySignature(byte[] hash, Signature signature) 
+        public bool VerifySignature(byte[] hash, Signature signature)
         {
             return _deformatter.VerifySignature(hash, signature.Sequence);
         }
@@ -42,7 +42,7 @@ namespace ZeroDocSigner.Common.Algorithm
                 case SignatureAlgorithmName.ECDsa:
                     // TODO: Implement for ECDsa
                     throw new NotImplementedException();
-                    //break;
+                //break;
                 case SignatureAlgorithmName.RSA:
                     formatter = new RSAPKCS1SignatureFormatter(certificate.GetRSAPrivateKey()!);
                     deformatter = new RSAPKCS1SignatureDeformatter(certificate.GetRSAPublicKey()!);

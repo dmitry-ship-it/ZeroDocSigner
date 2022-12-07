@@ -14,6 +14,12 @@ namespace ZeroDocSigner.Common.Algorithm
         public static Signature Create(byte[] data, X509Certificate2 certificate, SignatureParameters parameters)
         {
             using var hasher = HashAlgorithm.Create(parameters.HashAlgorithmName.Name);
+
+            if (hasher is null)
+            {
+                throw new ArgumentException("Invalid hash algorithm name.", nameof(parameters));
+            }
+
             var hash = hasher.ComputeHash(data);
 
             var algorithm = SignatureAlgorithm.Create(parameters, certificate);
