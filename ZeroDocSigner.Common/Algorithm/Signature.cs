@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
+﻿using System.Security.Cryptography.X509Certificates;
 using System.Text.Json.Serialization;
 
 namespace ZeroDocSigner.Common.Algorithm
@@ -11,17 +10,12 @@ namespace ZeroDocSigner.Common.Algorithm
 
         public byte[] Sequence { get; init; }
 
-        public static Signature Create(byte[] data, X509Certificate2 certificate, SignatureParameters parameters)
+        public static Signature Create(
+            byte[] data,
+            X509Certificate2 certificate,
+            SignatureParameters parameters)
         {
-            using var hasher = HashAlgorithm.Create(parameters.HashAlgorithmName.Name);
-
-            if (hasher is null)
-            {
-                throw new ArgumentException("Invalid hash algorithm name.", nameof(parameters));
-            }
-
-            var hash = hasher.ComputeHash(data);
-
+            var hash = Hashing.Compute(data, parameters.HashAlgorithmName);
             var algorithm = SignatureAlgorithm.Create(parameters, certificate);
 
             return new Signature()

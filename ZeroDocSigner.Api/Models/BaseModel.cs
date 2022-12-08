@@ -2,6 +2,6 @@
 {
     public class BaseModel
     {
-        public byte[] Data { get; set; }
+        public byte[] Data { get; set; } = null!;
     }
 }

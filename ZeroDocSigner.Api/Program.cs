@@ -1,16 +1,8 @@
-using System.Security.Cryptography.X509Certificates;
-using ZeroDocSigner.Common;
+using ZeroDocSigner.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton(_ =>
-{
-    using var storage = new X509Store();
-    storage.Open(OpenFlags.ReadOnly);
-    var cert = storage.Certificates.First();
-    storage.Close();
-    return cert;
-});
+builder.Services.AddSingleton(CertificatesLoader.CertificateProvider);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -18,7 +10,6 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

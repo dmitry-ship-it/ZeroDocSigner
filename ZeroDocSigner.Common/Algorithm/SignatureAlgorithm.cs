@@ -51,8 +51,8 @@ namespace ZeroDocSigner.Common.Algorithm
                     throw new InvalidOperationException($"Signature algorithm name '{parameters.SignatureAlgorithmName}' is not found.");
             }
 
-            formatter.SetHashAlgorithm(parameters.HashAlgorithmName.Name);
-            deformatter.SetHashAlgorithm(parameters.HashAlgorithmName.Name);
+            formatter.SetHashAlgorithm(parameters.HashAlgorithmName.Name!);
+            deformatter.SetHashAlgorithm(parameters.HashAlgorithmName.Name!);
 
             return new(formatter, deformatter);
         }

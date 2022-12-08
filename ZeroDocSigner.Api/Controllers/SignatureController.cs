@@ -23,15 +23,22 @@ namespace ZeroDocSigner.Api.Controllers
         [HttpPost(nameof(Sign))]
         public IActionResult Sign([FromBody] SignModel model)
         {
-            var manager = new SignatureManager(model.Data, _certificate);
-            return Ok(manager.CreateSignature(model.Parameters, model.Force));
+            var manager = new SignatureManager(
+                model.Data, _certificate);
+
+            return Ok(manager.CreateSignature(
+                model.Parameters, model.Force));
         }
 
         [HttpPost(nameof(Verify))]
         public IActionResult Verify([FromBody] BaseModel model)
         {
-            _logger.LogInformation("Got data for verification, length={Length}", model.Data.Length);
-            var manager = new SignatureManager(model.Data, _certificate);
+            _logger.LogInformation("Got data for verification, length={Length}",
+                model.Data.Length);
+
+            var manager = new SignatureManager(
+                model.Data, _certificate);
+
             return Ok(manager.Verify());
         }
     }

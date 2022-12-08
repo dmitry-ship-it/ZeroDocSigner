@@ -1,15 +1,17 @@
-﻿using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
+﻿using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ZeroDocSigner.Common.Algorithm
 {
     [Serializable]
     public sealed class SignatureInfo
     {
-        public static string StartSequence => "*{SignStart}*";
+        [JsonIgnore]
+        public static byte[] StartSequence => Encoding.Default.GetBytes("*{SignStart}*");
 
-        public Signature[] Signatures { get; set; } = null!;
+        public Signature[] Signatures { get; set; } = Array.Empty<Signature>();
 
         private string Serialize()
         {
