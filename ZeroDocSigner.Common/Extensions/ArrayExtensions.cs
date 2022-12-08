@@ -36,7 +36,7 @@ namespace ZeroDocSigner.Common.Extensions
             return -1;
         }
 
-        public static T[] Concat<T>(this T[] first, T[] second)
+        public static T[] StickWith<T>(this T[] first, T[] second)
         {
             if (second.Length == 0)
             {

@@ -11,6 +11,9 @@ namespace ZeroDocSigner.Common.Algorithm
         [JsonIgnore]
         public static byte[] StartSequence => Encoding.Default.GetBytes("*{SignStart}*");
 
+        [JsonIgnore]
+        public const string SignaturesFileName = "ZeroSignatures";
+
         public Signature[] Signatures { get; set; } = Array.Empty<Signature>();
 
         private string Serialize()

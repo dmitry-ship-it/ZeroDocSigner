@@ -4,12 +4,10 @@ namespace ZeroDocSigner.Common.Manager
 {
     public interface ISigner
     {
-        public byte[] CreateSignature(SignatureParameters parameters, bool force = false);
+        public SignatureInfo CreateSignature(SignatureParameters parameters, bool force = false);
 
-        public byte[] AddSignature(SignatureParameters parameters);
+        public SignatureInfo AddSignature(SignatureParameters parameters);
 
-        public byte[] RemoveSignature(Signature signature);
-
-        public byte[] RemoveAllSignatures();
+        public SignatureInfo RemoveSignature(Signature signature);
     }
 }
