@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO.Compression;
-using System.Runtime.InteropServices;
 using System.Text;
 using ZeroDocSigner.Common.Algorithm;
 using ZeroDocSigner.Common.Extensions;
@@ -68,13 +67,15 @@ namespace ZeroDocSigner.Common.Manager
             memory.Write(_originalData);
             using (var archive = new ZipArchive(memory, ZipArchiveMode.Update))
             {
-                var signFile = archive.GetEntry(SignatureInfo.SignaturesFileName)
-                    ?? archive.CreateEntry(SignatureInfo.SignaturesFileName);
+                archive.Comment = _signatureInfo.Serialize();
 
-                using var writer = new StreamWriter(signFile.Open());
+                //var signFile = archive.GetEntry(SignatureInfo.SignaturesFileName)
+                //    ?? archive.CreateEntry(SignatureInfo.SignaturesFileName);
 
-                writer.Write(_signatureInfo.Serialize());
-                writer.Flush();
+                //using var writer = new StreamWriter(signFile.Open());
+
+                //writer.Write(_signatureInfo.Serialize());
+                //writer.Flush();
             }
             //memory.Seek(0, SeekOrigin.Begin);
             return memory.ToArray();

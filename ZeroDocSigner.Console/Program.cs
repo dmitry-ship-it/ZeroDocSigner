@@ -8,8 +8,8 @@ store.Open(OpenFlags.ReadOnly);
 using var certificate = store.Certificates.First();
 store.Close();
 
-var data = File.ReadAllBytes(@"C:\Users\dimat\source\repos\ZeroDocSigner\ZeroDocSigner.Console\bin\Debug\net7.0\;ko_signed.odt");
-//Console.WriteLine(path);
+var data = File.ReadAllBytes(@"C:\Users\dimat\source\repos\ZeroDocSigner\ZeroDocSigner.Console\bin\Debug\net7.0\;ko_signed_really.docx");
+
 var manager = new SignatureManager(data, DocumentType.Archive, certificate);
 
 var param = new SignatureParameters()
@@ -19,47 +19,8 @@ var param = new SignatureParameters()
 };
 
 //manager.CreateSignature(param, true);
-//manager.AddSignature(param);
+manager.AddSignature(param);
 Console.WriteLine(manager.Verify());
 //var bt = manager.BuildFile();
 //Console.WriteLine(bt.Length);
-//File.WriteAllBytes(@"C:\Users\dimat\source\repos\ZeroDocSigner\ZeroDocSigner.Console\bin\Debug\net7.0\;ko_signed.odt", bt);
-
-/*
-var data = new SignModel()
-{
-    Force = false,
-    Parameters = SignatureParameters.Default,
-    Data = File.ReadAllBytes(@"C:\Users\dimat\source\repos\ZeroDocSigner\ZeroDocSigner.Console\bin\Debug\net7.0\CV.pdf")
-};
-
-var content = JsonContent.Create(data);
-
-using var client = new HttpClient();
-
-var response = await client.PostAsync("https://localhost:7008/signature/sign",
-    content);
-
-var d = await response.Content.ReadFromJsonAsync<byte[]>();
-
-await File.WriteAllBytesAsync(@"C:\Users\dimat\source\repos\ZeroDocSigner\ZeroDocSigner.Console\bin\Debug\net7.0\CV_cp.pdf", d);
-*/
-
-/*
-var data = new BaseModel()
-{
-    Data = File.ReadAllBytes(@"C:\Users\dimat\source\repos\ZeroDocSigner\ZeroDocSigner.Console\bin\Debug\net7.0\CV_cp.pdf")
-};
-
-var content = JsonContent.Create(data);
-
-using var client = new HttpClient();
-
-var response = await client.PostAsync(
-    "https://localhost:7008/signature/verify",
-    content);
-
-var d = await response.Content.ReadFromJsonAsync<bool>();
-
-Console.WriteLine(d);
-*/
+//File.WriteAllBytes(@"C:\Users\dimat\source\repos\ZeroDocSigner\ZeroDocSigner.Console\bin\Debug\net7.0\;ko_signed_really.docx", bt);

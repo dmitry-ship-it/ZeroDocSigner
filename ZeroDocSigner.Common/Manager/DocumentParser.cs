@@ -98,17 +98,24 @@ namespace ZeroDocSigner.Common.Manager
             using var memory = new MemoryStream(data);
             using var archive = new ZipArchive(memory);
 
-            var signFile = archive.GetEntry(SignatureInfo.SignaturesFileName);
+            var signs = archive.Comment;
 
-            if (signFile is null)
+            if (string.IsNullOrEmpty(signs))
             {
                 return null;
             }
 
-            using var file = signFile.Open();
-            using var reader = new StreamReader(file);
+            //var signFile = archive.GetEntry(SignatureInfo.SignaturesFileName);
 
-            return JsonSerializer.Deserialize<SignatureInfo>(reader.ReadToEnd());
+            //if (signFile is null)
+            //{
+            //    return null;
+            //}
+
+            //using var file = signFile.Open();
+            //using var reader = new StreamReader(file);
+
+            return JsonSerializer.Deserialize<SignatureInfo>(signs);
         }
     }
 }
