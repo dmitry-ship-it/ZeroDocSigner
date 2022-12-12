@@ -1,4 +1,6 @@
-﻿using System.IO.Compression;
+﻿using System;
+using System.IO.Compression;
+using System.Runtime.InteropServices;
 using System.Text;
 using ZeroDocSigner.Common.Algorithm;
 using ZeroDocSigner.Common.Extensions;
@@ -28,17 +30,17 @@ namespace ZeroDocSigner.Common.Manager
             _signatureInfo = signatureInfo;
         }
 
-        public byte[] BuildDocument()
+        public byte[] Build()
         {
             return _documentType switch
             {
-                DocumentType.Binary => BuildBinaryDocument(),
-                DocumentType.Archive => BuildArchiveDocument(),
+                DocumentType.Binary => BuildBinary(),
+                DocumentType.Archive => BuildArchive(),
                 _ => throw new InvalidOperationException("Unknown document type.")
             };
         }
 
-        private byte[] BuildBinaryDocument()
+        private byte[] BuildBinary()
         {
             if (_modifiedData is null)
             {
@@ -55,27 +57,26 @@ namespace ZeroDocSigner.Common.Manager
             return _modifiedData.StickWith(signatureBytes);
         }
 
-        private byte[] BuildArchiveDocument()
+        private byte[] BuildArchive()
         {
             if (_signatureInfo is null)
             {
                 return _originalData;
             }
 
-            using var memory = new MemoryStream(_originalData);
-            using var archive = new ZipArchive(memory);
+            using var memory = new MemoryStream();
+            memory.Write(_originalData);
+            using (var archive = new ZipArchive(memory, ZipArchiveMode.Update))
+            {
+                var signFile = archive.GetEntry(SignatureInfo.SignaturesFileName)
+                    ?? archive.CreateEntry(SignatureInfo.SignaturesFileName);
 
-            var signFile = archive.Entries.FirstOrDefault(
-                    entry => entry.Name == SignatureInfo.SignaturesFileName) 
-                ?? archive.CreateEntry(SignatureInfo.SignaturesFileName);
+                using var writer = new StreamWriter(signFile.Open());
 
-            using var file = signFile.Open();
-            using var writer = new StreamWriter(file);
-
-            writer.Write(_signatureInfo.ToString());
-            writer.Flush();
-
-            memory.Position = 0;
+                writer.Write(_signatureInfo.Serialize());
+                writer.Flush();
+            }
+            //memory.Seek(0, SeekOrigin.Begin);
             return memory.ToArray();
         }
     }

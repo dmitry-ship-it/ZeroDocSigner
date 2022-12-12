@@ -7,6 +7,7 @@ namespace ZeroDocSigner.Common.Manager
     public class SignatureManager : ISigner, IVerifier, IUnsigner
     {
         private readonly DocumentParser _documentParser;
+        private readonly DocumentBuilder _documentBuilder;
         private readonly X509Certificate2 _certificate;
 
         public SignatureManager(
@@ -15,16 +16,18 @@ namespace ZeroDocSigner.Common.Manager
             X509Certificate2 certificate)
         {
             _documentParser = new DocumentParser(data, documentType);
+            _documentBuilder = new DocumentBuilder(data, documentType);
             _certificate = certificate;
         }
 
-        public SignatureInfo AddSignature(SignatureParameters parameters)
+        public void AddSignature(SignatureParameters parameters)
         {
             var signatures = _documentParser.SignatureInfo;
             if (signatures is null)
             {
-                return SignatureInfo.GetNewSignatureInfo(
-                    _documentParser.FileContent, _certificate, parameters);
+                _documentBuilder.SetSignatureInfo(SignatureInfo.GetNewSignatureInfo(
+                    _documentParser.FileContent, _certificate, parameters));
+                return;
             }
 
             var newSignature = Signature.Create(
@@ -32,10 +35,10 @@ namespace ZeroDocSigner.Common.Manager
 
             signatures.Signatures = signatures.Signatures.Add(newSignature);
 
-            return signatures;
+            _documentBuilder.SetSignatureInfo(signatures);
         }
 
-        public SignatureInfo CreateSignature(
+        public void CreateSignature(
             SignatureParameters parameters,
             bool force = false)
         {
@@ -47,9 +50,8 @@ namespace ZeroDocSigner.Common.Manager
 
             var fileData = _documentParser.FileContent;
 
-            // TODO: Remake with DocumentType
-            return SignatureInfo.GetNewSignatureInfo(
-                fileData, _certificate, parameters);
+            _documentBuilder.SetSignatureInfo(SignatureInfo.GetNewSignatureInfo(
+                fileData, _certificate, parameters));
         }
 
         public bool Verify()
@@ -76,15 +78,20 @@ namespace ZeroDocSigner.Common.Manager
             return verifier.VerifySignature(hash, signature);
         }
 
-        public SignatureInfo RemoveSignature(Signature signature)
+        public void RemoveSignature(Signature signature)
         {
-            var signInfo = GetSignatures()
+            var signInfo = _documentParser.SignatureInfo
                 ?? throw new InvalidOperationException("No signatures to remove.");
 
             signInfo.Signatures = signInfo.Signatures.RemoveOne(
                 el => el.Sequence.SequenceEqual(signature.Sequence));
 
-            return signInfo;
+            _documentBuilder.SetSignatureInfo(signInfo);
+        }
+
+        public byte[] BuildFile()
+        {
+            return _documentBuilder.Build();
         }
     }
 }

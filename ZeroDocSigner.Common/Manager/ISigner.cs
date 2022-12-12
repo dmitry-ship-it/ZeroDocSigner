@@ -4,10 +4,10 @@ namespace ZeroDocSigner.Common.Manager
 {
     public interface ISigner
     {
-        public SignatureInfo CreateSignature(SignatureParameters parameters, bool force = false);
+        public void CreateSignature(SignatureParameters parameters, bool force = false);
 
-        public SignatureInfo AddSignature(SignatureParameters parameters);
+        public void AddSignature(SignatureParameters parameters);
 
-        public SignatureInfo RemoveSignature(Signature signature);
+        public void RemoveSignature(Signature signature);
     }
 }

@@ -12,11 +12,11 @@ namespace ZeroDocSigner.Common.Algorithm
         public static byte[] StartSequence => Encoding.Default.GetBytes("*{SignStart}*");
 
         [JsonIgnore]
-        public const string SignaturesFileName = "ZeroSignatures";
+        public const string SignaturesFileName = "ZeroSignatures.json";
 
         public Signature[] Signatures { get; set; } = Array.Empty<Signature>();
 
-        private string Serialize()
+        public string Serialize()
         {
             var options = new JsonSerializerOptions()
             {
@@ -42,7 +42,7 @@ namespace ZeroDocSigner.Common.Algorithm
 
         public override string ToString()
         {
-            return StartSequence
+            return Encoding.Default.GetString(StartSequence)
                 + Environment.NewLine
                 + Serialize();
         }

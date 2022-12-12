@@ -1,29 +1,29 @@
-﻿using System.Net.Http.Json;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using System.Text.Json;
-using ZeroDocSigner.Api.Models;
-using ZeroDocSigner.Common;
 using ZeroDocSigner.Common.Algorithm;
+using ZeroDocSigner.Common.Manager;
 
-//using var store = new X509Store();
-//store.Open(OpenFlags.ReadOnly);
-//using var certificate = store.Certificates.First();
-//store.Close();
+using var store = new X509Store();
+store.Open(OpenFlags.ReadOnly);
+using var certificate = store.Certificates.First();
+store.Close();
 
-//var path = Path.Combine(Directory.GetCurrentDirectory(), "CV.pdf");
-////Console.WriteLine(path);
-//var manager = new SignatureManager(File.ReadAllBytes(path), certificate);
+var data = File.ReadAllBytes(@"C:\Users\dimat\source\repos\ZeroDocSigner\ZeroDocSigner.Console\bin\Debug\net7.0\;ko_signed.odt");
+//Console.WriteLine(path);
+var manager = new SignatureManager(data, DocumentType.Archive, certificate);
 
-//var param = new SignatureParameters()
-//{
-//    HashAlgorithmName = HashAlgorithmName.SHA256,
-//    SignatureAlgorithmName = SignatureAlgorithmName.RSA
-//};
+var param = new SignatureParameters()
+{
+    HashAlgorithmName = HashAlgorithmName.SHA256,
+    SignatureAlgorithmName = SignatureAlgorithmName.RSA
+};
 
-////manager.CreateSignature(param, true);
-////manager.CreateSignature(param);
-//Console.WriteLine(manager.Verify());
+//manager.CreateSignature(param, true);
+//manager.AddSignature(param);
+Console.WriteLine(manager.Verify());
+//var bt = manager.BuildFile();
+//Console.WriteLine(bt.Length);
+//File.WriteAllBytes(@"C:\Users\dimat\source\repos\ZeroDocSigner\ZeroDocSigner.Console\bin\Debug\net7.0\;ko_signed.odt", bt);
 
 /*
 var data = new SignModel()
@@ -45,6 +45,7 @@ var d = await response.Content.ReadFromJsonAsync<byte[]>();
 await File.WriteAllBytesAsync(@"C:\Users\dimat\source\repos\ZeroDocSigner\ZeroDocSigner.Console\bin\Debug\net7.0\CV_cp.pdf", d);
 */
 
+/*
 var data = new BaseModel()
 {
     Data = File.ReadAllBytes(@"C:\Users\dimat\source\repos\ZeroDocSigner\ZeroDocSigner.Console\bin\Debug\net7.0\CV_cp.pdf")
@@ -61,4 +62,4 @@ var response = await client.PostAsync(
 var d = await response.Content.ReadFromJsonAsync<bool>();
 
 Console.WriteLine(d);
-
+*/

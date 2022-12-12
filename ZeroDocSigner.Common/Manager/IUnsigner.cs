@@ -4,6 +4,6 @@ namespace ZeroDocSigner.Common.Manager
 {
     public interface IUnsigner
     {
-        public SignatureInfo RemoveSignature(Signature signature);
+        public void RemoveSignature(Signature signature);
     }
 }

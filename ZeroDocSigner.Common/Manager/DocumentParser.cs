@@ -98,8 +98,12 @@ namespace ZeroDocSigner.Common.Manager
             using var memory = new MemoryStream(data);
             using var archive = new ZipArchive(memory);
 
-            var signFile = archive.Entries.First(
-                entry => entry.Name == SignatureInfo.SignaturesFileName);
+            var signFile = archive.GetEntry(SignatureInfo.SignaturesFileName);
+
+            if (signFile is null)
+            {
+                return null;
+            }
 
             using var file = signFile.Open();
             using var reader = new StreamReader(file);
