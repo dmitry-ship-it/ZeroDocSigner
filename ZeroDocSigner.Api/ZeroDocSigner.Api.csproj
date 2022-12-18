@@ -14,4 +14,8 @@
     <ProjectReference Include="..\ZeroDocSigner.Common\ZeroDocSigner.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+  <None Update="public_privatekey.pfx" CopyToOutputDirectory="Always"/>
+  </ItemGroup>
+
 </Project>

@@ -1,26 +1,82 @@
-﻿using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
-using ZeroDocSigner.Common.Algorithm;
-using ZeroDocSigner.Common.Manager;
+﻿using System.Diagnostics;
+using ZeroDocSigner.Api.Models;
 
-using var store = new X509Store();
-store.Open(OpenFlags.ReadOnly);
-using var certificate = store.Certificates.First();
-store.Close();
-
-var data = File.ReadAllBytes(@"C:\Users\dimat\source\repos\ZeroDocSigner\ZeroDocSigner.Console\bin\Debug\net7.0\;ko_signed_really.docx");
-
-var manager = new SignatureManager(data, DocumentType.Archive, certificate);
-
-var param = new SignatureParameters()
+namespace ZeroDocSigner.Cli
 {
-    HashAlgorithmName = HashAlgorithmName.SHA256,
-    SignatureAlgorithmName = SignatureAlgorithmName.RSA
-};
+    public static class Program
+    {
+        static void PrintInfo()
+        {
+            Console.WriteLine();
+            Console.WriteLine("-s or --sign to create digitally sign file");
+            Console.WriteLine("-f or --force to override existing digital signature inside file");
+            Console.WriteLine("-v or --verify to verify signed file");
+            Console.WriteLine();
+        }
 
-//manager.CreateSignature(param, true);
-manager.AddSignature(param);
-Console.WriteLine(manager.Verify());
-//var bt = manager.BuildFile();
-//Console.WriteLine(bt.Length);
-//File.WriteAllBytes(@"C:\Users\dimat\source\repos\ZeroDocSigner\ZeroDocSigner.Console\bin\Debug\net7.0\;ko_signed_really.docx", bt);
+        static async Task Execute(string[] args)
+        {
+            var commands = new ConsoleCommands(args);
+            var path = commands.FileInfo.FullName;
+            var data = File.ReadAllBytes(path);
+            using var client = new Client("http://localhost:5000");
+
+            if (commands.IsSign)
+            {
+                var signModel = new SignModel
+                {
+                    Data = data,
+                    Force = commands.IsForce
+                };
+
+                var signed = await client.SignAsync(signModel);
+
+                var modifiedPathPart = commands.FileInfo
+                    .Extension
+                    .Replace(".", "_signed.");
+
+                File.WriteAllBytes(
+                    path.Replace(
+                        commands.FileInfo.Extension,
+                        modifiedPathPart),
+                    signed);
+
+                Console.WriteLine("Done");
+            }
+            else if (commands.IsVerify)
+            {
+                var dataModel = new DataModel
+                {
+                    Data = data
+                };
+
+                if (await client.VerifyAsync(dataModel))
+                {
+                    Console.WriteLine("OK");
+                }
+                else
+                {
+                    Console.WriteLine("Signature invalid or not found");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Unknown command");
+            }
+        }
+
+        static async Task Main(string[] args)
+        {
+            try
+            {
+                await Execute(args);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Debug.WriteLine(ex.StackTrace);
+                PrintInfo();
+            }
+        }
+    }
+}

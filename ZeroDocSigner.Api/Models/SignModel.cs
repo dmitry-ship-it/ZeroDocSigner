@@ -1,11 +1,10 @@
 ﻿using ZeroDocSigner.Common.Algorithm;
+using ZeroDocSigner.Common.Manager;
 
 namespace ZeroDocSigner.Api.Models
 {
-    public class SignModel: BaseModel
+    public class SignModel : DataModel
     {
-        public SignatureParameters Parameters { get; set; }
-
         public bool Force { get; set; }
     }
 }

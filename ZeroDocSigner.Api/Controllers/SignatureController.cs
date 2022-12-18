@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography.X509Certificates;
 using ZeroDocSigner.Api.Models;
 using ZeroDocSigner.Common;
+using ZeroDocSigner.Common.Manager;
 
 namespace ZeroDocSigner.Api.Controllers
 {
@@ -23,27 +24,24 @@ namespace ZeroDocSigner.Api.Controllers
         [HttpPost(nameof(Sign))]
         public IActionResult Sign([FromBody] SignModel model)
         {
-            throw new NotImplementedException();
+            var manager = new SignatureManager(
+                model.Data, _certificate);
 
-            //var manager = new SignatureManager(
-            //    model.Data, _certificate);
+            manager.AddSignature();
 
-            //return Ok(manager.CreateSignature(
-            //    model.Parameters, model.Force));
+            return Ok(manager.BuildFile());
         }
 
         [HttpPost(nameof(Verify))]
-        public IActionResult Verify([FromBody] BaseModel model)
+        public IActionResult Verify([FromBody] DataModel model)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation("Got data for verification, length={Length}",
+                model.Data.Length);
 
-            //_logger.LogInformation("Got data for verification, length={Length}",
-            //    model.Data.Length);
+            var manager = new SignatureManager(
+                model.Data, _certificate);
 
-            //var manager = new SignatureManager(
-            //    model.Data, _certificate);
-
-            //return Ok(manager.Verify());
+            return Ok(manager.Verify());
         }
     }
 }

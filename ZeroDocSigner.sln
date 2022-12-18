@@ -5,9 +5,9 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroDocSigner.Common", "ZeroDocSigner.Common\ZeroDocSigner.Common.csproj", "{4AFD9CBB-D7EB-4A6E-AEF0-30F9250AE1C1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroDocSigner.Console", "ZeroDocSigner.Console\ZeroDocSigner.Console.csproj", "{7C41A77E-BF70-4C86-9CD6-59098127D783}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroDocSigner.Cli", "ZeroDocSigner.Console\ZeroDocSigner.Cli.csproj", "{7C41A77E-BF70-4C86-9CD6-59098127D783}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroDocSigner.Api", "ZeroDocSigner.Api\ZeroDocSigner.Api.csproj", "{D2375504-B152-4AC6-9948-A78666E2B09C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroDocSigner.Api", "ZeroDocSigner.Api\ZeroDocSigner.Api.csproj", "{D2375504-B152-4AC6-9948-A78666E2B09C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

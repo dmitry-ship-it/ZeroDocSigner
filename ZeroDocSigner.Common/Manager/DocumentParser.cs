@@ -22,7 +22,7 @@ namespace ZeroDocSigner.Common.Manager
 
         private (byte[], SignatureInfo?) DivideFile(byte[] data)
         {
-            var signaturesStart = data.FindSequenceIndex(SignatureInfo.StartSequence);
+            var signaturesStart = data.FindLastSequenceIndex(SignatureInfo.StartSequence);
             return (GetContent(data, signaturesStart), GetSignatures(data, signaturesStart));
         }
 
@@ -43,9 +43,7 @@ namespace ZeroDocSigner.Common.Manager
                 return data;
             }
 
-            var newLineBytes = Encoding.Default.GetByteCount(Environment.NewLine);
-
-            return data.Take(signaturesStart - SignatureInfo.StartSequence.Length - newLineBytes);
+            return data.Take(signaturesStart);
         }
 
         private static byte[] GetContentFromArchive(byte[] data)
@@ -88,9 +86,10 @@ namespace ZeroDocSigner.Common.Manager
                 return null;
             }
 
+            var newLineBytes = Encoding.Default.GetByteCount(Environment.NewLine);
+
             return JsonSerializer.Deserialize<SignatureInfo>(
-                Encoding.Default.GetString(
-                        data.TakeFrom(signaturesStart)));
+                data.TakeFrom(signaturesStart + SignatureInfo.StartSequence.Length + newLineBytes));
         }
 
         private static SignatureInfo? GetSignaturesFromArchive(byte[] data)

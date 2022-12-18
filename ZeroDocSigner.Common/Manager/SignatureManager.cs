@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using System.IO.Compression;
+using System.Security.Cryptography.X509Certificates;
 using ZeroDocSigner.Common.Algorithm;
 using ZeroDocSigner.Common.Extensions;
 
@@ -12,35 +13,41 @@ namespace ZeroDocSigner.Common.Manager
 
         public SignatureManager(
             byte[] data,
-            DocumentType documentType,
             X509Certificate2 certificate)
         {
+            var documentType = GetDocumentType(data);
+
             _documentParser = new DocumentParser(data, documentType);
             _documentBuilder = new DocumentBuilder(data, documentType);
             _certificate = certificate;
+
+            _documentBuilder.SetContent(_documentParser.FileContent);
         }
 
-        public void AddSignature(SignatureParameters parameters)
+        public void AddSignature()
         {
             var signatures = _documentParser.SignatureInfo;
             if (signatures is null)
             {
                 _documentBuilder.SetSignatureInfo(SignatureInfo.GetNewSignatureInfo(
-                    _documentParser.FileContent, _certificate, parameters));
+                    _documentParser.FileContent, _certificate));
                 return;
             }
 
             var newSignature = Signature.Create(
-                _documentParser.FileContent, _certificate, parameters);
+                _documentParser.FileContent, _certificate);
+
+            if (signatures.Signatures.Any(s => s.Sequence.SequenceEqual(newSignature.Sequence)))
+            {
+                throw new InvalidOperationException("File is already signed");
+            }
 
             signatures.Signatures = signatures.Signatures.Add(newSignature);
 
             _documentBuilder.SetSignatureInfo(signatures);
         }
 
-        public void CreateSignature(
-            SignatureParameters parameters,
-            bool force = false)
+        public void CreateSignature(bool force = false)
         {
             if (!force && _documentParser.SignatureInfo is not null)
             {
@@ -51,14 +58,14 @@ namespace ZeroDocSigner.Common.Manager
             var fileData = _documentParser.FileContent;
 
             _documentBuilder.SetSignatureInfo(SignatureInfo.GetNewSignatureInfo(
-                fileData, _certificate, parameters));
+                fileData, _certificate));
         }
 
         public bool Verify()
         {
             if (_documentParser.SignatureInfo is null)
             {
-                throw new InvalidOperationException("Nothing to verify.");
+                return false;
             }
 
             var signatures = _documentParser.SignatureInfo!;
@@ -67,13 +74,11 @@ namespace ZeroDocSigner.Common.Manager
 
         public bool Verify(Signature signature)
         {
-            var verifier = SignatureAlgorithm.Create(
-                signature.Parameters,
-                _certificate);
+            var verifier = SignatureAlgorithm.Create(_certificate);
 
             var hash = Hashing.Compute(
                 _documentParser.FileContent,
-                signature.Parameters.HashAlgorithmName);
+                verifier.HashAlgorithm);
 
             return verifier.VerifySignature(hash, signature);
         }
@@ -92,6 +97,21 @@ namespace ZeroDocSigner.Common.Manager
         public byte[] BuildFile()
         {
             return _documentBuilder.Build();
+        }
+
+        private static DocumentType GetDocumentType(byte[] data)
+        {
+            try
+            {
+                using var memory = new MemoryStream(data);
+                using var archive = new ZipArchive(memory);
+            }
+            catch (InvalidDataException)
+            {
+                return DocumentType.Binary;
+            }
+
+            return DocumentType.Archive;
         }
     }
 }

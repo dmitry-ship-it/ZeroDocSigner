@@ -6,21 +6,17 @@ namespace ZeroDocSigner.Common.Algorithm
     [Serializable]
     public readonly struct Signature
     {
-        public SignatureParameters Parameters { get; init; }
-
         public byte[] Sequence { get; init; }
 
         public static Signature Create(
             byte[] data,
-            X509Certificate2 certificate,
-            SignatureParameters parameters)
+            X509Certificate2 certificate)
         {
-            var hash = Hashing.Compute(data, parameters.HashAlgorithmName);
-            var algorithm = SignatureAlgorithm.Create(parameters, certificate);
+            var algorithm = SignatureAlgorithm.Create(certificate);
+            var hash = Hashing.Compute(data, algorithm.HashAlgorithm);
 
-            return new Signature()
+            return new()
             {
-                Parameters = parameters,
                 Sequence = algorithm.CreateSignature(hash)
             };
         }

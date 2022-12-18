@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.X509Certificates;
 
 namespace ZeroDocSigner.Common.Algorithm
@@ -10,11 +11,15 @@ namespace ZeroDocSigner.Common.Algorithm
 
         public SignatureAlgorithm(
             AsymmetricSignatureFormatter formatter,
-            AsymmetricSignatureDeformatter deformatter)
+            AsymmetricSignatureDeformatter deformatter,
+            HashAlgorithmName hashAlgorithmName)
         {
             _formatter = formatter;
             _deformatter = deformatter;
+            HashAlgorithm = hashAlgorithmName;
         }
+
+        public HashAlgorithmName HashAlgorithm { get; }
 
         public byte[] CreateSignature(byte[] hash)
         {
@@ -26,35 +31,50 @@ namespace ZeroDocSigner.Common.Algorithm
             return _deformatter.VerifySignature(hash, signature.Sequence);
         }
 
-        public static SignatureAlgorithm Create(
-            SignatureParameters parameters,
-            X509Certificate2 certificate)
+        public static SignatureAlgorithm Create(X509Certificate2 certificate)
         {
+            var privateKey = GetKeyFromCertificate(certificate, true);
+            var publicKey = GetKeyFromCertificate(certificate, false);
+
             AsymmetricSignatureFormatter formatter;
             AsymmetricSignatureDeformatter deformatter;
 
-            switch (parameters.SignatureAlgorithmName)
+            var algorithmName = certificate.SignatureAlgorithm.FriendlyName!;
+            if (algorithmName.Contains("RSA", StringComparison.CurrentCultureIgnoreCase))
             {
-                case SignatureAlgorithmName.DSA:
-                    formatter = new DSASignatureFormatter(certificate.GetDSAPrivateKey()!);
-                    deformatter = new DSASignatureDeformatter(certificate.GetDSAPublicKey()!);
-                    break;
-                case SignatureAlgorithmName.ECDsa:
-                    // TODO: Implement for ECDsa
-                    throw new NotImplementedException();
-                //break;
-                case SignatureAlgorithmName.RSA:
-                    formatter = new RSAPKCS1SignatureFormatter(certificate.GetRSAPrivateKey()!);
-                    deformatter = new RSAPKCS1SignatureDeformatter(certificate.GetRSAPublicKey()!);
-                    break;
-                default:
-                    throw new InvalidOperationException($"Signature algorithm name '{parameters.SignatureAlgorithmName}' is not found.");
+                formatter = new RSAPKCS1SignatureFormatter(privateKey);
+                deformatter = new RSAPKCS1SignatureDeformatter(publicKey);
+            }
+            else if (algorithmName.Contains("DSA", StringComparison.CurrentCultureIgnoreCase))
+            {
+                formatter = new DSASignatureFormatter(privateKey);
+                deformatter = new DSASignatureDeformatter(publicKey);
+            }
+            else
+            {
+                throw new ArgumentException("Unknown key algorithm");
             }
 
-            formatter.SetHashAlgorithm(parameters.HashAlgorithmName.Name!);
-            deformatter.SetHashAlgorithm(parameters.HashAlgorithmName.Name!);
+            var signer = new CmsSigner(certificate);
+            var hashAlgorithm = HashAlgorithmName.FromOid(signer.DigestAlgorithm.Value!);
 
-            return new(formatter, deformatter);
+            formatter.SetHashAlgorithm(hashAlgorithm.Name!);
+            deformatter.SetHashAlgorithm(hashAlgorithm.Name!);
+
+            return new(formatter, deformatter, hashAlgorithm);
+        }
+
+        private static AsymmetricAlgorithm GetKeyFromCertificate(X509Certificate2 certificate, bool getPrivate)
+        {
+            var key = getPrivate
+                ? certificate.GetRSAPrivateKey()
+                    ?? certificate.GetDSAPrivateKey() as AsymmetricAlgorithm
+                    ?? certificate.GetECDsaPrivateKey()
+                : certificate.GetRSAPublicKey()
+                    ?? certificate.GetDSAPublicKey() as AsymmetricAlgorithm
+                    ?? certificate.GetECDsaPublicKey();
+
+            return key!;
         }
     }
 }

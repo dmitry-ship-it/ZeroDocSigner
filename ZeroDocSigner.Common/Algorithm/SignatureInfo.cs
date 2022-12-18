@@ -28,14 +28,13 @@ namespace ZeroDocSigner.Common.Algorithm
 
         public static SignatureInfo GetNewSignatureInfo(
             byte[] data,
-            X509Certificate2 certificate,
-            SignatureParameters parameters)
+            X509Certificate2 certificate)
         {
-            return new SignatureInfo()
+            return new()
             {
                 Signatures = new[]
                 {
-                    Signature.Create(data, certificate, parameters)
+                    Signature.Create(data, certificate)
                 }
             };
         }

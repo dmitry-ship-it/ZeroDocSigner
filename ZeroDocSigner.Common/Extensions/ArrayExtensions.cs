@@ -1,35 +1,41 @@
 ﻿using System.Numerics;
+using System.Text;
 
 namespace ZeroDocSigner.Common.Extensions
 {
     public static class ArrayExtensions
     {
-        public static long FindSequenceIndex<T>(this T[] array, T[] sequence)
-            where T : IComparisonOperators<T, T, bool>
+        public static long FindLastSequenceIndex<T>(this T[] array, T[] sequence)
+            where T : IEqualityOperators<T, T, bool>
         {
             if (sequence.LongLength > array.LongLength)
             {
                 return -1;
             }
 
-            for (var i = 0L; i < array.LongLength; i++)
+            //File.WriteAllText("wtf.txt", $"{{{string.Join(", ", array)}}}");
+
+            for (var i = array.LongLength - 1; i >= 0L; i--)
             {
-                if (array[i] == sequence[0])
+                if (array[i] == sequence[^1])
                 {
-                    var j = 0L;
+                    var targetIndex = i;
+                    var j = sequence.LongLength - 1;
 
-                    while (i != array.LongLength
-                        && j != sequence.LongLength
-                        && array[i] == array[j])
+                    while (targetIndex != -1L
+                        && j != -1L
+                        && array[targetIndex] == sequence[j])
                     {
-                        i++;
-                        j++;
+                        targetIndex--;
+                        j--;
                     }
 
-                    if (j == sequence.LongLength)
+                    if (j == -1)
                     {
-                        return i + 2;
+                        return i - sequence.LongLength + 1;
                     }
+
+                    i = targetIndex;
                 }
             }
 
@@ -86,13 +92,18 @@ namespace ZeroDocSigner.Common.Extensions
 
         public static T[] TakeFrom<T>(this T[] array, long index)
         {
-            if (array.Length >= index)
+            if (array.Length <= index)
             {
                 return array;
             }
 
             var result = new T[array.Length - index];
-            Array.Copy(array, index, result, 0, result.Length);
+
+            //for (long i = 0L, j = index; i < result.Length && j < array.Length; i++, j++)
+            //{
+            //    result[i] = array[j];
+            //}
+            Array.Copy(array, index, result, 0L, result.Length);
 
             return result;
         }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Security.Cryptography.X509Certificates;
+﻿using System.Security.Cryptography.X509Certificates;
 
 namespace ZeroDocSigner.Api
 {
@@ -7,13 +6,15 @@ namespace ZeroDocSigner.Api
     {
         public static Func<IServiceProvider, X509Certificate2> CertificateProvider => GetCertificate;
 
-        private static X509Certificate2 GetCertificate(IServiceProvider _)
+        private static X509Certificate2 GetCertificate(IServiceProvider serviceProvider)
         {
-            using var storage = new X509Store();
-            storage.Open(OpenFlags.ReadOnly);
-            var cert = storage.Certificates.First();
-            storage.Close();
-            return cert;
+            var cfg = serviceProvider.GetRequiredService<IConfiguration>();
+            var section = cfg.GetSection("cert");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), section["file"]!);
+
+            return new X509Certificate2(path, section["password"],
+                X509KeyStorageFlags.Exportable
+                | X509KeyStorageFlags.PersistKeySet);
         }
     }
 }
