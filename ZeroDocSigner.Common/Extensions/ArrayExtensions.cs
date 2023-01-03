@@ -13,8 +13,6 @@ namespace ZeroDocSigner.Common.Extensions
                 return -1;
             }
 
-            //File.WriteAllText("wtf.txt", $"{{{string.Join(", ", array)}}}");
-
             for (var i = array.LongLength - 1; i >= 0L; i--)
             {
                 if (array[i] == sequence[^1])
@@ -98,11 +96,6 @@ namespace ZeroDocSigner.Common.Extensions
             }
 
             var result = new T[array.Length - index];
-
-            //for (long i = 0L, j = index; i < result.Length && j < array.Length; i++, j++)
-            //{
-            //    result[i] = array[j];
-            //}
             Array.Copy(array, index, result, 0L, result.Length);
 
             return result;

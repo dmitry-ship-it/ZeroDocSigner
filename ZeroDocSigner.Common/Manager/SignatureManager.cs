@@ -1,7 +1,10 @@
 ﻿using System.IO.Compression;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using System.Xml.Linq;
 using ZeroDocSigner.Common.Algorithm;
 using ZeroDocSigner.Common.Extensions;
+using ZeroDocSigner.Models;
 
 namespace ZeroDocSigner.Common.Manager
 {
@@ -13,9 +16,11 @@ namespace ZeroDocSigner.Common.Manager
 
         public SignatureManager(
             byte[] data,
-            X509Certificate2 certificate)
+            X509Certificate2 certificate,
+            SignerModel? signerInfo = null)
         {
             var documentType = GetDocumentType(data);
+            data = SetProperties(data, documentType, signerInfo);
 
             _documentParser = new DocumentParser(data, documentType);
             _documentBuilder = new DocumentBuilder(data, documentType);
@@ -61,17 +66,6 @@ namespace ZeroDocSigner.Common.Manager
                 fileData, _certificate));
         }
 
-        public bool Verify()
-        {
-            if (_documentParser.SignatureInfo is null)
-            {
-                return false;
-            }
-
-            var signatures = _documentParser.SignatureInfo!;
-            return signatures.Signatures.Any(Verify);
-        }
-
         public bool Verify(Signature signature)
         {
             var verifier = SignatureAlgorithm.Create(_certificate);
@@ -81,6 +75,17 @@ namespace ZeroDocSigner.Common.Manager
                 verifier.HashAlgorithm);
 
             return verifier.VerifySignature(hash, signature);
+        }
+
+        public bool Verify()
+        {
+            if (_documentParser.SignatureInfo is null)
+            {
+                return false;
+            }
+
+            var signatures = _documentParser.SignatureInfo!;
+            return signatures.Signatures.Any(Verify);
         }
 
         public void RemoveSignature(Signature signature)
@@ -112,6 +117,61 @@ namespace ZeroDocSigner.Common.Manager
             }
 
             return DocumentType.Archive;
+        }
+
+        public byte[] SetProperties(byte[] data, DocumentType documentType, SignerModel? signer)
+        {
+            if (documentType != DocumentType.Archive || signer is null)
+            {
+                return data;
+            }
+
+            using var memory = new MemoryStream();
+            memory.Write(data);
+            using (var archive = new ZipArchive(memory, ZipArchiveMode.Update))
+            {
+                var entry = archive.GetEntry("docProps/core.xml");
+
+                foreach (var item in archive.Entries)
+                {
+                    Console.WriteLine(item.Name);
+                }
+
+                if (entry is null)
+                {
+                    return data;
+                }
+
+                var content = new StreamReader(entry!.Open());
+                var text = content.ReadToEnd();
+
+                var statusIndex = text.IndexOf("</cp:contentStatus>");
+                if (statusIndex == -1)
+                {
+                    text = text.Replace("</cp:coreProperties>",
+                        $"<cp:contentStatus>Подписано: {signer.Signer}</cp:contentStatus></cp:coreProperties>");
+                }
+                else
+                {
+                    statusIndex--;
+                    var sb = new StringBuilder(text);
+                    while (statusIndex != -1 && sb[statusIndex] != '>')
+                    {
+                        sb.Remove(statusIndex, 1);
+                        statusIndex--;
+                    }
+
+                    sb.Replace("<cp:contentStatus>", $"<cp:contentStatus>Подписано: {signer.Signer}");
+                    text = sb.ToString();
+                }
+
+                using (content) { }
+
+                using var writer = new StreamWriter(entry.Open());
+                writer.Write(text);
+            }
+
+            return memory.ToArray();
         }
     }
 }

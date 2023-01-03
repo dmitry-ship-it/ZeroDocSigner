@@ -5,9 +5,11 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroDocSigner.Common", "ZeroDocSigner.Common\ZeroDocSigner.Common.csproj", "{4AFD9CBB-D7EB-4A6E-AEF0-30F9250AE1C1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroDocSigner.Cli", "ZeroDocSigner.Console\ZeroDocSigner.Cli.csproj", "{7C41A77E-BF70-4C86-9CD6-59098127D783}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroDocSigner.Api", "ZeroDocSigner.Api\ZeroDocSigner.Api.csproj", "{D2375504-B152-4AC6-9948-A78666E2B09C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroDocSigner.Cli", "ZeroDocSigner.Cli\ZeroDocSigner.Cli.csproj", "{64C6000B-0187-4F53-B0AF-891AE7399401}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroDocSigner.Models", "ZeroDocSigner.Models\ZeroDocSigner.Models.csproj", "{5B107201-D936-4987-AC2D-3143FE5097DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +21,18 @@ Global
 		{4AFD9CBB-D7EB-4A6E-AEF0-30F9250AE1C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AFD9CBB-D7EB-4A6E-AEF0-30F9250AE1C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AFD9CBB-D7EB-4A6E-AEF0-30F9250AE1C1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7C41A77E-BF70-4C86-9CD6-59098127D783}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7C41A77E-BF70-4C86-9CD6-59098127D783}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7C41A77E-BF70-4C86-9CD6-59098127D783}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7C41A77E-BF70-4C86-9CD6-59098127D783}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D2375504-B152-4AC6-9948-A78666E2B09C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D2375504-B152-4AC6-9948-A78666E2B09C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D2375504-B152-4AC6-9948-A78666E2B09C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D2375504-B152-4AC6-9948-A78666E2B09C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64C6000B-0187-4F53-B0AF-891AE7399401}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64C6000B-0187-4F53-B0AF-891AE7399401}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64C6000B-0187-4F53-B0AF-891AE7399401}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64C6000B-0187-4F53-B0AF-891AE7399401}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B107201-D936-4987-AC2D-3143FE5097DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B107201-D936-4987-AC2D-3143FE5097DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B107201-D936-4987-AC2D-3143FE5097DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B107201-D936-4987-AC2D-3143FE5097DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

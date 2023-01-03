@@ -1,5 +1,6 @@
-﻿using System.Net.Http.Json;
-using ZeroDocSigner.Api.Models;
+﻿using System.Net;
+using System.Net.Http.Json;
+using ZeroDocSigner.Models;
 
 namespace ZeroDocSigner.Cli
 {
@@ -13,12 +14,19 @@ namespace ZeroDocSigner.Cli
             this.baseUri = new Uri(baseUri);
         }
 
-        public async Task<byte[]> SignAsync(SignModel signModel, CancellationToken cancellationToken = default)
+        public async Task<byte[]> SignAsync(SignModel signModel,
+            CancellationToken cancellationToken = default)
         {
             var response = await client.PostAsJsonAsync(
-                new Uri(baseUri, "/signature/sign"),
+                new Uri(baseUri, "/sign"),
                 signModel,
                 cancellationToken);
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                throw new HttpRequestException(
+                    await response.Content.ReadAsStringAsync(cancellationToken));
+            }
 
             var data = await response.Content.ReadFromJsonAsync<byte[]>(
                 cancellationToken: cancellationToken);
@@ -26,12 +34,19 @@ namespace ZeroDocSigner.Cli
             return data!;
         }
 
-        public async Task<bool> VerifyAsync(DataModel dataModel, CancellationToken cancellationToken = default)
+        public async Task<bool> VerifyAsync(DataModel dataModel,
+            CancellationToken cancellationToken = default)
         {
             var response = await client.PostAsJsonAsync(
-                new Uri(baseUri, "/signature/verify"),
+                new Uri(baseUri, "/verify"),
                 dataModel,
                 cancellationToken);
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                throw new HttpRequestException(
+                    await response.Content.ReadAsStringAsync(cancellationToken));
+            }
 
             return await response.Content.ReadFromJsonAsync<bool>(
                 cancellationToken: cancellationToken);

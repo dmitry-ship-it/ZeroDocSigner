@@ -10,11 +10,11 @@ namespace ZeroDocSigner.Api
         {
             var cfg = serviceProvider.GetRequiredService<IConfiguration>();
             var section = cfg.GetSection("cert");
+
             var path = Path.Combine(Directory.GetCurrentDirectory(), section["file"]!);
 
             return new X509Certificate2(path, section["password"],
-                X509KeyStorageFlags.Exportable
-                | X509KeyStorageFlags.PersistKeySet);
+                X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet);
         }
     }
 }

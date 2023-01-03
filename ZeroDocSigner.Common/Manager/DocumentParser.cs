@@ -3,6 +3,7 @@ using System.Text;
 using ZeroDocSigner.Common.Algorithm;
 using ZeroDocSigner.Common.Extensions;
 using System.IO.Compression;
+using ZeroDocSigner.Models;
 
 namespace ZeroDocSigner.Common.Manager
 {
@@ -13,7 +14,6 @@ namespace ZeroDocSigner.Common.Manager
         public DocumentParser(byte[] data, DocumentType documentType)
         {
             _documentType = documentType;
-
             (FileContent, SignatureInfo) = DivideFile(data);
         }
 
@@ -46,39 +46,6 @@ namespace ZeroDocSigner.Common.Manager
             return data.Take(signaturesStart);
         }
 
-        private static byte[] GetContentFromArchive(byte[] data)
-        {
-            using var memory = new MemoryStream(data);
-            using var archive = new ZipArchive(memory);
-
-            var archiveContent = Enumerable.Empty<byte>();
-
-            foreach (var entry in archive.Entries)
-            {
-                if (entry.Name == SignatureInfo.SignaturesFileName)
-                {
-                    continue;
-                }
-
-                using var file = entry.Open();
-                using var reader = new StreamReader(file);
-                archiveContent = archiveContent.Concat(
-                    Encoding.Default.GetBytes(reader.ReadToEnd()));
-            }
-
-            return archiveContent.ToArray();
-        }
-
-        private SignatureInfo? GetSignatures(byte[] data, long signaturesStart)
-        {
-            return _documentType switch
-            {
-                DocumentType.Binary => GetSignaturesFromBinary(data, signaturesStart),
-                DocumentType.Archive => GetSignaturesFromArchive(data),
-                _ => throw new InvalidOperationException("Unknown document type.")
-            };
-        }
-
         private static SignatureInfo? GetSignaturesFromBinary(byte[] data, long signaturesStart)
         {
             if (signaturesStart == -1)
@@ -90,6 +57,24 @@ namespace ZeroDocSigner.Common.Manager
 
             return JsonSerializer.Deserialize<SignatureInfo>(
                 data.TakeFrom(signaturesStart + SignatureInfo.StartSequence.Length + newLineBytes));
+        }
+
+        private static byte[] GetContentFromArchive(byte[] data)
+        {
+            using var memory = new MemoryStream(data);
+            using var archive = new ZipArchive(memory);
+
+            var archiveContent = Enumerable.Empty<byte>();
+
+            foreach (var entry in archive.Entries)
+            {
+                using var file = entry.Open();
+                using var reader = new StreamReader(file);
+                archiveContent = archiveContent.Concat(
+                    Encoding.Default.GetBytes(reader.ReadToEnd()));
+            }
+
+            return archiveContent.ToArray();
         }
 
         private static SignatureInfo? GetSignaturesFromArchive(byte[] data)
@@ -104,17 +89,17 @@ namespace ZeroDocSigner.Common.Manager
                 return null;
             }
 
-            //var signFile = archive.GetEntry(SignatureInfo.SignaturesFileName);
-
-            //if (signFile is null)
-            //{
-            //    return null;
-            //}
-
-            //using var file = signFile.Open();
-            //using var reader = new StreamReader(file);
-
             return JsonSerializer.Deserialize<SignatureInfo>(signs);
+        }
+
+        private SignatureInfo? GetSignatures(byte[] data, long signaturesStart)
+        {
+            return _documentType switch
+            {
+                DocumentType.Binary => GetSignaturesFromBinary(data, signaturesStart),
+                DocumentType.Archive => GetSignaturesFromArchive(data),
+                _ => throw new InvalidOperationException("Unknown document type.")
+            };
         }
     }
 }

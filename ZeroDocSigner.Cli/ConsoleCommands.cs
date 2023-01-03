@@ -8,16 +8,30 @@ namespace ZeroDocSigner.Cli
 {
     internal class ConsoleCommands
     {
+        private readonly string[] supportedFileExtensions =
+        {
+            ".doc", ".xls", ".ppt",
+            ".docx", ".xlsx", ".pptx",
+            ".odt", ".ods", ".odp",
+            ".pdf"
+        };
+
         public bool IsSign { get; private set; }
         public bool IsVerify { get; private set; }
         public bool IsForce { get; private set; }
         public FileInfo FileInfo { get; private set; } = null!;
+        public string Signer { get; private set; } = null!;
 
         public ConsoleCommands(string[] args)
         {
             SetCommand(args);
             SetForce(args);
             SetFileInfo(args);
+
+            if (IsSign)
+            {
+                SetSigner(args);
+            }
         }
 
         private void SetCommand(string[] args)
@@ -30,7 +44,8 @@ namespace ZeroDocSigner.Cli
 
             if (signCommand is null && verifyCommand is null)
             {
-                throw new ArgumentException("Please, pick one of actions", nameof(args));
+                throw new ArgumentException("Please, pick one of actions",
+                    nameof(args));
             }
 
             CheckCommand(signCommand, "-s", "--sign");
@@ -39,7 +54,8 @@ namespace ZeroDocSigner.Cli
             if (signCommand is not null && verifyCommand is not null)
             {
                 throw new ArgumentException(
-                    $"Please, pick only one of this options ({signCommand.ToLower()} or {verifyCommand.ToLower()})",
+                    "Please, pick only one of this options: " +
+                    $"({signCommand.ToLower()} or {verifyCommand.ToLower()})",
                     nameof(args));
             }
 
@@ -55,11 +71,10 @@ namespace ZeroDocSigner.Cli
 
         private void SetForce(string[] args)
         {
-            var force = args.SingleOrDefault(a => a.Equals("-f"));
-            if (force is null)
-            {
-                IsForce = false;
-            }
+            var force = args.SingleOrDefault(a => a.Contains(
+                "-f", StringComparison.CurrentCultureIgnoreCase));
+
+            IsForce = force is not null;
 
             CheckCommand(force, "-f", "--force");
         }
@@ -76,6 +91,37 @@ namespace ZeroDocSigner.Cli
             var dir = Directory.GetCurrentDirectory();
 
             FileInfo = new(Path.Combine(dir, path));
+
+            if (supportedFileExtensions.All(e =>
+                !e.Equals(FileInfo.Extension,
+                    StringComparison.CurrentCultureIgnoreCase)))
+            {
+                throw new NotSupportedException($"File with extension \"{FileInfo.Extension}\" is not supported.");
+            }
+        }
+
+        private void SetSigner(string[] args)
+        {
+            var command = Array.Find(args, arg => arg.Contains(
+                "-p", StringComparison.CurrentCultureIgnoreCase));
+
+            var index = Array.IndexOf(args, command);
+
+            if (command is null || index == -1 || index == args.Length)
+            {
+                throw new InvalidOperationException("Please, use or fix argument of -p command");
+            }
+
+            var next = args[index + 1];
+
+            if (next.Contains('-'))
+            {
+                throw new ArgumentException("Invalid input");
+            }
+
+            Signer = next;
+
+            CheckCommand(command, "-p", "--position");
         }
 
         private static void CheckCommand(string? command, params string[] expected)

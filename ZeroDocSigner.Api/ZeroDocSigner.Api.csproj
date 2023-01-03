@@ -12,10 +12,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ZeroDocSigner.Common\ZeroDocSigner.Common.csproj" />
+    <ProjectReference Include="..\ZeroDocSigner.Models\ZeroDocSigner.Models.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-  <None Update="public_privatekey.pfx" CopyToOutputDirectory="Always"/>
+    <None Update="public_privatekey.pfx" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
 </Project>

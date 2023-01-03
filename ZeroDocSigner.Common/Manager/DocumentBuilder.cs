@@ -1,8 +1,8 @@
-﻿using System;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Text;
 using ZeroDocSigner.Common.Algorithm;
 using ZeroDocSigner.Common.Extensions;
+using ZeroDocSigner.Models;
 
 namespace ZeroDocSigner.Common.Manager
 {
@@ -68,16 +68,8 @@ namespace ZeroDocSigner.Common.Manager
             using (var archive = new ZipArchive(memory, ZipArchiveMode.Update))
             {
                 archive.Comment = _signatureInfo.Serialize();
-
-                //var signFile = archive.GetEntry(SignatureInfo.SignaturesFileName)
-                //    ?? archive.CreateEntry(SignatureInfo.SignaturesFileName);
-
-                //using var writer = new StreamWriter(signFile.Open());
-
-                //writer.Write(_signatureInfo.Serialize());
-                //writer.Flush();
             }
-            //memory.Seek(0, SeekOrigin.Begin);
+
             return memory.ToArray();
         }
     }
