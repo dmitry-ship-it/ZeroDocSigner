@@ -1,7 +1,6 @@
-﻿namespace ZeroDocSigner.Models
+﻿namespace ZeroDocSigner.Models;
+
+public class DataModel
 {
-    public class DataModel
-    {
-        public byte[] Data { get; set; }
-    }
+    public byte[] Data { get; set; }
 }

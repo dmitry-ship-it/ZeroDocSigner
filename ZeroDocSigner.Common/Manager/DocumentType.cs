@@ -1,8 +1,7 @@
-﻿namespace ZeroDocSigner.Common.Manager
+﻿namespace ZeroDocSigner.Common.Manager;
+
+public enum DocumentType
 {
-    public enum DocumentType
-    {
-        Binary,
-        Archive
-    }
+    Binary,
+    Archive
 }

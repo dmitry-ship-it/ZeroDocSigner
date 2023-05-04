@@ -1,8 +1,12 @@
 using ZeroDocSigner.Api;
+using ZeroDocSigner.Api.Extensions;
+using ZeroDocSigner.Common.V2.Services.Abstractions;
+using ZeroDocSigner.Common.V2.Services.Implementation;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton(CertificatesLoader.CertificateProvider);
+builder.Services.AddSingleton<IOfficeDocumentService, OfficeDocumentService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -12,18 +16,7 @@ var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-    app.Use(async (context, next) =>
-    {
-        try
-        {
-            await next();
-        }
-        catch (Exception ex)
-        {
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            await context.Response.WriteAsJsonAsync(ex.Message);
-        }
-    });
+    app.UseExceptionLogger();
 }
 
 if (app.Environment.IsDevelopment())
@@ -33,9 +26,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

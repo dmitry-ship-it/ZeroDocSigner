@@ -1,7 +1,6 @@
-﻿namespace ZeroDocSigner.Models
+﻿namespace ZeroDocSigner.Models;
+
+public class SignerModel
 {
-    public class SignerModel
-    {
-        public string Signer { get; set; }
-    }
+    public string Signer { get; set; }
 }

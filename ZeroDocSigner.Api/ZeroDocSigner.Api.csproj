@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ZeroDocSigner.Common.V2\ZeroDocSigner.Common.V2.csproj" />
     <ProjectReference Include="..\ZeroDocSigner.Common\ZeroDocSigner.Common.csproj" />
     <ProjectReference Include="..\ZeroDocSigner.Models\ZeroDocSigner.Models.csproj" />
   </ItemGroup>

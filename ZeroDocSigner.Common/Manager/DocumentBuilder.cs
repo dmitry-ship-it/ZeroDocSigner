@@ -2,75 +2,71 @@
 using System.Text;
 using ZeroDocSigner.Common.Algorithm;
 using ZeroDocSigner.Common.Extensions;
-using ZeroDocSigner.Models;
 
-namespace ZeroDocSigner.Common.Manager
+namespace ZeroDocSigner.Common.Manager;
+
+public class DocumentBuilder
 {
-    public class DocumentBuilder
+    private readonly byte[] originalData;
+    private readonly DocumentType documentType;
+    private byte[]? modifiedData;
+    private SignatureInfo? signatureInfo;
+
+    public DocumentBuilder(byte[] originalData, DocumentType documentType)
     {
-        private readonly byte[] _originalData;
-        private readonly DocumentType _documentType;
-        private byte[]? _modifiedData;
-        private SignatureInfo? _signatureInfo;
+        this.originalData = originalData;
+        this.documentType = documentType;
+    }
 
-        public DocumentBuilder(byte[] orignalData, DocumentType documentType)
+    public void SetContent(byte[] content)
+    {
+        modifiedData = content;
+    }
+
+    public void SetSignatureInfo(SignatureInfo signatureInfo)
+    {
+        this.signatureInfo = signatureInfo;
+    }
+
+    public byte[] Build() =>
+        documentType switch
         {
-            _originalData = orignalData;
-            _documentType = documentType;
+            DocumentType.Binary => BuildBinary(),
+            DocumentType.Archive => BuildArchive(),
+            _ => throw new InvalidOperationException("Unknown document type.")
+        };
+
+    private byte[] BuildBinary()
+    {
+        if (modifiedData is null)
+        {
+            throw new InvalidOperationException("File content was not privided.");
         }
 
-        public void SetContent(byte[] content)
+        if (signatureInfo is null)
         {
-            _modifiedData = content;
+            return modifiedData;
         }
 
-        public void SetSignatureInfo(SignatureInfo signatureInfo)
+        var signatureBytes = Encoding.Default.GetBytes(signatureInfo.ToString());
+
+        return modifiedData.StickWith(signatureBytes);
+    }
+
+    private byte[] BuildArchive()
+    {
+        if (signatureInfo is null)
         {
-            _signatureInfo = signatureInfo;
+            return originalData;
         }
 
-        public byte[] Build()
+        using var memory = new MemoryStream();
+        memory.Write(originalData);
+        using (var archive = new ZipArchive(memory, ZipArchiveMode.Update))
         {
-            return _documentType switch
-            {
-                DocumentType.Binary => BuildBinary(),
-                DocumentType.Archive => BuildArchive(),
-                _ => throw new InvalidOperationException("Unknown document type.")
-            };
+            archive.Comment = signatureInfo.Serialize();
         }
 
-        private byte[] BuildBinary()
-        {
-            if (_modifiedData is null)
-            {
-                throw new InvalidOperationException("File content was not privided.");
-            }
-
-            if (_signatureInfo is null)
-            {
-                return _modifiedData;
-            }
-
-            var signatureBytes = Encoding.Default.GetBytes(_signatureInfo.ToString());
-
-            return _modifiedData.StickWith(signatureBytes);
-        }
-
-        private byte[] BuildArchive()
-        {
-            if (_signatureInfo is null)
-            {
-                return _originalData;
-            }
-
-            using var memory = new MemoryStream();
-            memory.Write(_originalData);
-            using (var archive = new ZipArchive(memory, ZipArchiveMode.Update))
-            {
-                archive.Comment = _signatureInfo.Serialize();
-            }
-
-            return memory.ToArray();
-        }
+        return memory.ToArray();
     }
 }

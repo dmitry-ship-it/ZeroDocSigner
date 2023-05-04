@@ -1,9 +1,8 @@
 ﻿using ZeroDocSigner.Common.Algorithm;
 
-namespace ZeroDocSigner.Common.Manager
+namespace ZeroDocSigner.Common.Manager;
+
+public interface IUnsigner
 {
-    public interface IUnsigner
-    {
-        public void RemoveSignature(Signature signature);
-    }
+    public void RemoveSignature(Signature signature);
 }

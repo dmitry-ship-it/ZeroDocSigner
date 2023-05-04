@@ -1,13 +1,12 @@
 ﻿using ZeroDocSigner.Common.Algorithm;
 
-namespace ZeroDocSigner.Common.Manager
+namespace ZeroDocSigner.Common.Manager;
+
+public interface ISigner
 {
-    public interface ISigner
-    {
-        public void CreateSignature(bool force = false);
+    public void CreateSignature(bool force = false);
 
-        public void AddSignature();
+    public void AddSignature();
 
-        public void RemoveSignature(Signature signature);
-    }
+    public void RemoveSignature(Signature signature);
 }
