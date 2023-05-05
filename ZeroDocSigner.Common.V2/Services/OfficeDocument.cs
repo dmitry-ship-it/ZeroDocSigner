@@ -215,7 +215,10 @@ public class OfficeDocument : IDisposable
             .Where(attribute => attribute?.StartsWith(AttributeSignaturePathBegin) == true);
 
         var lastSignature = signatures.Any()
-            ? signatures.Max(value => int.Parse(value?.Replace(AttributeSignaturePathBegin, string.Empty) ?? "0"))
+            ? signatures.Max(value => int.Parse(value?
+                .Replace(AttributeSignaturePathBegin, string.Empty)
+                .Replace(".xml", string.Empty)
+                    ?? "0"))
             : 0;
 
         var contentTypesDocument = new XmlContentTypesDocument(xmlDocument);

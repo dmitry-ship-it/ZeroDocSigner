@@ -10,5 +10,4 @@ public record OfficeSignatureInfo(
     string CountryName,
     string SignerRole,
     string CommitmentType, // Description
-    string CommitmentTypeQualifier,
     byte[] Document);

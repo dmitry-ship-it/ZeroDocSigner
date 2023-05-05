@@ -170,7 +170,7 @@ public class OfficeDocumentSignature
             signatureInfo.CountryName,
             signatureInfo.SignerRole,
             signatureInfo.CommitmentType,
-            signatureInfo.CommitmentTypeQualifier));
+            signatureInfo.SignatureComments));
 
         return (XmlElement)document.GetElementsByTagName(XmlSignatureConstants.Nodes.Object)[0]!;
     }
