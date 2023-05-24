@@ -5,9 +5,9 @@ namespace ZeroDocSigner.Api;
 
 public static class CertificatesLoader
 {
-    public static Func<IServiceProvider, X509Certificate2> CertificateProvider => GetCertificate;
+    public static Func<IServiceProvider, (string CertificatePath, string Password)> CertificateProvider => GetCertificate;
 
-    private static X509Certificate2 GetCertificate(IServiceProvider serviceProvider)
+    private static (string CertificatePath, string Password) GetCertificate(IServiceProvider serviceProvider)
     {
         var cfg = serviceProvider.GetRequiredService<IConfiguration>();
         var section = cfg.GetSection("cert");
@@ -18,7 +18,7 @@ public static class CertificatesLoader
         {
             using var rsa = RSA.Create();
             var certificateRequest = new CertificateRequest(
-                "CN=ZeroDocSigner",
+                $"CN={section["subjectName"]}",
                 rsa,
                 HashAlgorithmName.SHA256,
                 RSASignaturePadding.Pkcs1);
@@ -29,7 +29,6 @@ public static class CertificatesLoader
                 .Export(X509ContentType.Pfx, section["password"]));
         }
 
-        return new X509Certificate2(path, section["password"],
-            X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet);
+        return (path, section["password"]!);
     }
 }

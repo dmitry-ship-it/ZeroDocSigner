@@ -3,6 +3,7 @@ using ZeroDocSigner.Models;
 
 namespace ZeroDocSigner.Cli;
 
+// TODO: Update whole project to make it compatible with v2 API
 public static class Program
 {
     static void PrintInfo()

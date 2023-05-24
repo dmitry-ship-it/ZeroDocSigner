@@ -7,17 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ZeroDocSigner.Common.V2\ZeroDocSigner.Common.V2.csproj" />
-    <ProjectReference Include="..\ZeroDocSigner.Common\ZeroDocSigner.Common.csproj" />
-    <ProjectReference Include="..\ZeroDocSigner.Models\ZeroDocSigner.Models.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="public_privatekey.pfx" CopyToOutputDirectory="Always" />
+    <ProjectReference Include="..\ZeroDocSigner.AnyDocument\ZeroDocSigner.AnyDocument.csproj" />
+    <ProjectReference Include="..\ZeroDocSigner.OfficeDocument\ZeroDocSigner.OfficeDocument.csproj" />
+    <ProjectReference Include="..\ZeroDocSigner.OpenDocument\ZeroDocSigner.OpenDocument.csproj" />
+    <ProjectReference Include="..\ZeroDocSigner.PdfDocument\ZeroDocSigner.PdfDocument.csproj" />
   </ItemGroup>
 
 </Project>

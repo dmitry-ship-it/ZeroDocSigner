@@ -1,44 +1,55 @@
-using Microsoft.AspNetCore.Mvc;
-using System.Security.Cryptography.X509Certificates;
-using ZeroDocSigner.Models;
-using ZeroDocSigner.Common.Manager;
+﻿using Microsoft.AspNetCore.Mvc;
+using ZeroDocSigner.AnyDocument.Interfaces;
+using ZeroDocSigner.AnyDocument.Models;
+using ZeroDocSigner.OfficeDocument.Models;
+using ZeroDocSigner.OpenDocument.Models;
+using ZeroDocSigner.PdfDocument.Models;
+using ZeroDocSigner.Shared.Interfaces;
+using ZeroDocSigner.Shared.Models;
 
 namespace ZeroDocSigner.Api.Controllers;
 
 [ApiController]
+[Route("api/v2")]
 public class SignatureController : ControllerBase
 {
-    private readonly X509Certificate2 certificate;
-    private readonly ILogger<SignatureController> logger;
-
-    public SignatureController(
-        X509Certificate2 certificate,
-        ILogger<SignatureController> logger)
+    [HttpPost($"{nameof(Sign)}/office")]
+    public IActionResult Sign(
+        [FromBody] OfficeSignatureInfo signatureInfo,
+        [FromServices] IDocumentSignatureService<OfficeSignatureInfo> signatureService)
     {
-        this.certificate = certificate;
-        this.logger = logger;
+        return Ok(new DocumentModel(signatureService.Sign(signatureInfo)));
     }
 
-    [HttpPost(nameof(Sign))]
-    public IActionResult Sign([FromBody] SignModel model)
+    [HttpPost($"{nameof(Sign)}/open")]
+    public IActionResult Sign(
+        [FromBody] OpenSignatureInfo signatureInfo,
+        [FromServices] IDocumentSignatureService<OpenSignatureInfo> signatureService)
     {
-        var manager = new SignatureManager(
-            model.Data, certificate, model.SignerInfo);
+        return Ok(new DocumentModel(signatureService.Sign(signatureInfo)));
+    }
 
-        manager.CreateSignature(model.Force);
+    [HttpPost($"{nameof(Sign)}/pdf")]
+    public IActionResult Sign(
+        [FromBody] PdfSignatureInfo signatureInfo,
+        [FromServices] IDocumentSignatureService<PdfSignatureInfo> signatureService)
+    {
+        return Ok(new DocumentModel(signatureService.Sign(signatureInfo)));
+    }
 
-        return Ok(manager.BuildFile());
+    [HttpPost($"{nameof(Sign)}/any")]
+    public IActionResult Sign(
+        [FromBody] AnySignatureInfo signatureInfo,
+        [FromServices] IAnyDocumentSignatureService signatureService)
+    {
+        return Ok(new DocumentModel(signatureService.Sign(signatureInfo)));
     }
 
     [HttpPost(nameof(Verify))]
-    public IActionResult Verify([FromBody] DataModel model)
+    public IActionResult Verify(
+        [FromBody] DocumentModel model,
+        [FromServices] IAnyDocumentSignatureService signatureService)
     {
-        logger.LogInformation("Got data for verification, size={Length} bytes",
-            model.Data.Length);
-
-        var manager = new SignatureManager(
-            model.Data, certificate);
-
-        return Ok(manager.Verify());
+        return Ok(signatureService.Verify(model.Document));
     }
 }
