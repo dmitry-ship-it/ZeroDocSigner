@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ZeroDocSigner.AnyDocument.Interfaces;
 using ZeroDocSigner.AnyDocument.Models;
 using ZeroDocSigner.OfficeDocument.Models;
@@ -10,9 +11,10 @@ using ZeroDocSigner.Shared.Models;
 namespace ZeroDocSigner.Api.Controllers;
 
 [ApiController]
-[Route("api/v2")]
+[Route("api")]
 public class SignatureController : ControllerBase
 {
+    [Authorize]
     [HttpPost($"{nameof(Sign)}/office")]
     public IActionResult Sign(
         [FromBody] OfficeSignatureInfo signatureInfo,
@@ -21,6 +23,7 @@ public class SignatureController : ControllerBase
         return Ok(new DocumentModel(signatureService.Sign(signatureInfo)));
     }
 
+    [Authorize]
     [HttpPost($"{nameof(Sign)}/open")]
     public IActionResult Sign(
         [FromBody] OpenSignatureInfo signatureInfo,
@@ -29,6 +32,7 @@ public class SignatureController : ControllerBase
         return Ok(new DocumentModel(signatureService.Sign(signatureInfo)));
     }
 
+    [Authorize]
     [HttpPost($"{nameof(Sign)}/pdf")]
     public IActionResult Sign(
         [FromBody] PdfSignatureInfo signatureInfo,
@@ -37,6 +41,7 @@ public class SignatureController : ControllerBase
         return Ok(new DocumentModel(signatureService.Sign(signatureInfo)));
     }
 
+    [Authorize]
     [HttpPost($"{nameof(Sign)}/any")]
     public IActionResult Sign(
         [FromBody] AnySignatureInfo signatureInfo,
@@ -45,6 +50,7 @@ public class SignatureController : ControllerBase
         return Ok(new DocumentModel(signatureService.Sign(signatureInfo)));
     }
 
+    [Authorize]
     [HttpPost(nameof(Verify))]
     public IActionResult Verify(
         [FromBody] DocumentModel model,

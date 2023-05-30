@@ -7,11 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.5" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ZeroDocSigner.AnyDocument\ZeroDocSigner.AnyDocument.csproj" />
+    <ProjectReference Include="..\ZeroDocSigner.Api.Authentication\ZeroDocSigner.Api.Authentication.csproj" />
+    <ProjectReference Include="..\ZeroDocSigner.Api.Services\ZeroDocSigner.Api.Services.csproj" />
     <ProjectReference Include="..\ZeroDocSigner.OfficeDocument\ZeroDocSigner.OfficeDocument.csproj" />
     <ProjectReference Include="..\ZeroDocSigner.OpenDocument\ZeroDocSigner.OpenDocument.csproj" />
     <ProjectReference Include="..\ZeroDocSigner.PdfDocument\ZeroDocSigner.PdfDocument.csproj" />

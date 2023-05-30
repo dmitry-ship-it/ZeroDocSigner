@@ -82,7 +82,7 @@ public class PdfDocument : IDocument<PdfSignatureInfo>
     private static void FillSigner(PdfSigner signer, bool approve)
     {
         signer.SetSignDate(DateTime.Now);
-        signer.SetCertificationLevel(approve ? PdfSigner.NOT_CERTIFIED : PdfSigner.CERTIFIED_NO_CHANGES_ALLOWED);
+        signer.SetCertificationLevel(approve ? PdfSigner.NOT_CERTIFIED : PdfSigner.CERTIFIED_FORM_FILLING_AND_ANNOTATIONS);
     }
 
     private static bool CheckForSignatures(byte[] pdfDocument)

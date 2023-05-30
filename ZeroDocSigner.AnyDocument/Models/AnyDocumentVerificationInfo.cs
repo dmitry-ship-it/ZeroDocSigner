@@ -10,5 +10,4 @@ public record AnyDocumentVerificationInfo(
     string PostalCode,
     string CountryName,
     string SignerRole,
-
     string CommitmentType); // Description

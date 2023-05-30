@@ -39,8 +39,7 @@ internal class DocumentParser
 
     private static byte[] GetContentFromBinary(byte[] data)
     {
-        var markBytes = Encoding.UTF8.GetBytes(JsonSignatureConstants.SignaturesStartMark);
-        var signaturesStart = data.FindLastSequenceIndex(markBytes);
+        var signaturesStart = GetSignaturesMarkIndex(data);
 
         if (signaturesStart == -1)
         {
@@ -52,8 +51,7 @@ internal class DocumentParser
 
     private static List<JsonSignature> GetSignaturesFromBinary(byte[] data)
     {
-        var markBytes = Encoding.UTF8.GetBytes(JsonSignatureConstants.SignaturesStartMark);
-        var signaturesStart = data.FindLastSequenceIndex(markBytes);
+        var signaturesStart = GetSignaturesMarkIndex(data);
 
         if (signaturesStart == -1)
         {
@@ -61,8 +59,9 @@ internal class DocumentParser
         }
 
         var newLineBytes = Encoding.Default.GetByteCount(Environment.NewLine);
+        var indexAfterSignaturesMark = signaturesStart + JsonSignatureConstants.SignaturesStartMark.Length + newLineBytes;
 
-        return Encoding.UTF8.GetString(data.TakeFrom(signaturesStart + JsonSignatureConstants.SignaturesStartMark.Length + newLineBytes))
+        return Encoding.UTF8.GetString(data.TakeFrom(indexAfterSignaturesMark))
             .DeserializeWithoutEscaping<List<JsonSignature>>() ?? new();
     }
 
@@ -106,5 +105,11 @@ internal class DocumentParser
             DocumentType.Archive => GetSignaturesFromArchive(documentStream),
             _ => throw new InvalidOperationException("Unknown document type.")
         };
+    }
+
+    private static long GetSignaturesMarkIndex(byte[] data)
+    {
+        var markBytes = Encoding.UTF8.GetBytes(JsonSignatureConstants.SignaturesStartMark);
+        return data.FindLastSequenceIndex(markBytes);
     }
 }

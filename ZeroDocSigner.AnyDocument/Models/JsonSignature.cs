@@ -6,5 +6,4 @@ public record JsonSignature(
     JsonHashHolder DocumentHash,
     JsonHashHolder PropertiesHash,
     string Signature, // Base64
-
     string Certificate); // Base64

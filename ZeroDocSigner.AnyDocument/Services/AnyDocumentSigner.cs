@@ -8,7 +8,11 @@ namespace ZeroDocSigner.AnyDocument.Services;
 
 internal static class AnyDocumentSigner
 {
-    public static void Sign(DocumentBuilder documentBuilder, X509Certificate2 certificate, AnySignatureInfo signatureInfo, byte[] data)
+    public static void Sign(
+        DocumentBuilder documentBuilder,
+        X509Certificate2 certificate,
+        AnySignatureInfo signatureInfo,
+        byte[] data)
     {
         if (signatureInfo.Force)
         {
@@ -104,7 +108,6 @@ internal static class AnyDocumentSigner
 
         var signedPropertiesBytes = Convert.FromBase64String(signature.SignedProperties);
 
-        // documentParser.DataToSign
         var documentHash = hashAlgorithm.ComputeHash(data);
         var propertiesHash = hashAlgorithm.ComputeHash(signedPropertiesBytes);
         var isValid = verifier.VerifySignature(
