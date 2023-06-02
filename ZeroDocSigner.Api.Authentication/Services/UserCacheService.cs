@@ -17,7 +17,7 @@ public class UserCacheService : IUserCacheService
         await cache.SetStringAsync(
             user.UserName,
             user.Password,
-            new() { AbsoluteExpiration = DateTimeOffset.Now.AddHours(1)},
+            new() { AbsoluteExpiration = DateTimeOffset.Now.AddHours(1) },
             cancellationToken);
     }
 

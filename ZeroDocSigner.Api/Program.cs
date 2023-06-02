@@ -2,6 +2,7 @@ using ZeroDocSigner.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddApplicationServices();
 builder.Services.AddAllowingEverythingCors();
 builder.Services.AddDistributedMemoryCache();

@@ -92,7 +92,7 @@ public class OfficeDocument : IDocument<OfficeSignatureInfo>
     private void ValidateAndThrow()
     {
         if (!entries.Any(entry => SupportedOfficeDocumentTypes.MetaValues
-            .Any(value => entry.Key.StartsWith(value.InnerEntryRoot))))
+            .Any(meta => entry.Key.StartsWith(meta.InnerEntryRoot))))
         {
             throw new ArgumentException(ExceptionMessages.InvalidDocumentType);
         }

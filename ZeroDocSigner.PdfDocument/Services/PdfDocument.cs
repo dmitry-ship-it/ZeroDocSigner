@@ -40,6 +40,8 @@ public class PdfDocument : IDocument<PdfSignatureInfo>
 
         // Create a PDF signer object to apply the signature
         var signer = new PdfSigner(reader, output, stampingProperties);
+
+        // get X509 certificate instance and private key from stream
         var (certificateInstance, privateKey) = ParseCertificateStream(certificate, certificatePassword);
 
         var chain = new[] { certificateInstance };

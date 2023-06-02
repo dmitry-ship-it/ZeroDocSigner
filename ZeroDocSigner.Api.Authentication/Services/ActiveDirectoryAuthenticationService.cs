@@ -19,7 +19,15 @@ public class ActiveDirectoryAuthenticationService : IAuthenticationService
 
     public ActiveDirectoryAuthenticationService(IConfiguration configuration, IUserCacheService userCacheService)
     {
-        domainContext = new(ContextType.Domain, configuration.GetSection("ActiveDirectory")["Domain"]);
+        try
+        {
+            domainContext = new(ContextType.Domain, configuration.GetSection("ActiveDirectory")["Domain"]);
+        }
+        catch (Exception ex)
+        {
+            throw new AuthenticationException("Failed to login into AD", ex);
+        }
+
         this.userCacheService = userCacheService;
         this.configuration = configuration;
     }
@@ -48,7 +56,7 @@ public class ActiveDirectoryAuthenticationService : IAuthenticationService
             claims: new[] { new Claim(JwtRegisteredClaimNames.Name, userName) },
             notBefore: now,
             expires: now.Add(TimeSpan.FromHours(1)),
-            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.Aes128CbcHmacSha256));
+            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.Aes256CbcHmacSha512));
 
         var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 

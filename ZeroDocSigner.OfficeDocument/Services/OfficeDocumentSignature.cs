@@ -158,7 +158,7 @@ internal class OfficeDocumentSignature : IXmlDocumentSignature
             PreserveWhitespace = true
         };
 
-        // put all needed values to template and load it as XmlDocument
+        // seed all needed values to template and load it as XmlDocument
         document.LoadXml(officeObjectTemplate.Format(
             signatureInfo.SignatureComments,
             signatureInfo.AddressPrimary,

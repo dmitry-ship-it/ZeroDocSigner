@@ -17,15 +17,12 @@ namespace ZeroDocSigner.Api.Extensions;
 
 public static class ServiceCollectionExtension
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S112:General exceptions should never be thrown", Justification = "<Pending>")]
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         if (!OperatingSystem.IsWindows())
         {
-            throw new SystemException("Current OS is not supported. Use Windows to host this server.");
+            throw new PlatformNotSupportedException("Current OS is not supported. Use Windows to host this server.");
         }
-
-        services.AddHttpContextAccessor();
 
         services.AddScoped<IUserCacheService, UserCacheService>();
         services.AddScoped<IAuthenticationService, ActiveDirectoryAuthenticationService>();
@@ -40,7 +37,6 @@ public static class ServiceCollectionExtension
                 httpContext.HttpContext?.User.Identity?.Name!).Result);
         });
 
-        // standardized signature implementation
         services.AddScoped<IDocumentSignatureService<OfficeSignatureInfo>, OfficeDocumentService>();
         services.AddScoped<IDocumentSignatureService<OpenSignatureInfo>, OpenDocumentService>();
         services.AddScoped<IDocumentSignatureService<PdfSignatureInfo>, PdfDocumentService>();

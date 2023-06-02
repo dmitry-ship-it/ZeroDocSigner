@@ -5,8 +5,6 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroDocSigner.Api", "ZeroDocSigner.Api\ZeroDocSigner.Api.csproj", "{D2375504-B152-4AC6-9948-A78666E2B09C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroDocSigner.Cli", "ZeroDocSigner.Cli\ZeroDocSigner.Cli.csproj", "{64C6000B-0187-4F53-B0AF-891AE7399401}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroDocSigner.Shared", "ZeroDocSigner.Shared\ZeroDocSigner.Shared.csproj", "{8EECA9D5-81B9-43A4-B149-1A23D6122A2C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroDocSigner.OfficeDocument", "ZeroDocSigner.OfficeDocument\ZeroDocSigner.OfficeDocument.csproj", "{3DCF5154-B48E-4DBF-AD4A-B4D1117D61F6}"
@@ -19,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroDocSigner.AnyDocument",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroDocSigner.Api.Authentication", "ZeroDocSigner.Api.Authentication\ZeroDocSigner.Api.Authentication.csproj", "{D0DDA6EA-239E-48C8-8B55-9F143837D326}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroDocSigner.Api.Services", "ZeroDocSigner.Api.Services\ZeroDocSigner.Api.Services.csproj", "{9D6CC6C2-2585-49D7-81F5-AEBCB11DBEBD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroDocSigner.Api.Services", "ZeroDocSigner.Api.Services\ZeroDocSigner.Api.Services.csproj", "{9D6CC6C2-2585-49D7-81F5-AEBCB11DBEBD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,10 +29,6 @@ Global
 		{D2375504-B152-4AC6-9948-A78666E2B09C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D2375504-B152-4AC6-9948-A78666E2B09C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D2375504-B152-4AC6-9948-A78666E2B09C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{64C6000B-0187-4F53-B0AF-891AE7399401}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{64C6000B-0187-4F53-B0AF-891AE7399401}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{64C6000B-0187-4F53-B0AF-891AE7399401}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{64C6000B-0187-4F53-B0AF-891AE7399401}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8EECA9D5-81B9-43A4-B149-1A23D6122A2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8EECA9D5-81B9-43A4-B149-1A23D6122A2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8EECA9D5-81B9-43A4-B149-1A23D6122A2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
