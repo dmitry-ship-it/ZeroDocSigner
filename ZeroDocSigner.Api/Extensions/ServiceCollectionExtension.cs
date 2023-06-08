@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using ZeroDocSigner.AnyDocument;
@@ -69,11 +70,16 @@ public static class ServiceCollectionExtension
                 {
                     ValidateIssuer = true,
                     ValidIssuer = section["Issuer"],
+
                     ValidateAudience = true,
                     ValidAudience = section["Audience"],
+
                     ValidateLifetime = true,
+
                     IssuerSigningKey = key,
                     ValidateIssuerSigningKey = true,
+
+                    NameClaimType = JwtRegisteredClaimNames.Name
                 };
             });
 
